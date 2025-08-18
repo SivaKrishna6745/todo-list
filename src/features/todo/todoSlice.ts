@@ -16,10 +16,9 @@ const todoSlice = createSlice({
         addTodo: (state: todoState, action: PayloadAction<Todo>) => {
             state.todos.push(action.payload);
         },
-        editTodo: (state: todoState, action: PayloadAction<{ id: string; changes: Partial<Todo> }>) => {
+        updateTodo: (state: todoState, action: PayloadAction<{ id: string; changes: Partial<Todo> }>) => {
             const todoIndex = state.todos.findIndex((todo: Todo) => todo.id === action.payload.id);
-            if (todoIndex !== -1) Object.assign(state.todos[todoIndex], action.payload);
-            state.todos = state.todos.filter((todo: Todo) => todo.id !== action.payload.id);
+            if (todoIndex !== -1) Object.assign(state.todos[todoIndex], action.payload.changes);
         },
         deleteTodo: (state: todoState, action: PayloadAction<string>) => {
             state.todos = state.todos.filter((todo: Todo) => todo.id !== action.payload);
@@ -32,5 +31,5 @@ const todoSlice = createSlice({
     },
 });
 
-export const { addTodo, editTodo, deleteTodo, toggleTodo } = todoSlice.actions;
+export const { addTodo, updateTodo, deleteTodo, toggleTodo } = todoSlice.actions;
 export default todoSlice.reducer;

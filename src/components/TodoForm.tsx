@@ -1,68 +1,66 @@
 import AddIcon from '@mui/icons-material/Add';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import { addTodo, editTodo } from '../features/todo/todoSlice';
+import { addTodo } from '../features/todo/todoSlice';
 import { useEffect, useState } from 'react';
 import type { Todo } from '../types';
 import { useDispatch } from 'react-redux';
 
 interface TodoForm {
-    editingTodo?: Todo;
+    setTodoErr: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const TodoForm = ({ editingTodo }: TodoForm) => {
+const TodoForm = ({ setTodoErr }: TodoForm) => {
     const dispatch = useDispatch();
-    const [todo, setTodo] = useState<Todo>(
-        editingTodo || {
-            id: '',
-            task: '',
-            completed: false,
-        }
-    );
+    const [todo, setTodo] = useState<Todo>({
+        id: '',
+        task: '',
+        completed: false,
+    });
     const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setTodo((prevState) => ({ ...prevState, task: value }));
     };
     useEffect(() => {
-        if (editingTodo) setTodo((prevState) => ({ ...prevState, task: editingTodo.task }));
-        else
-            setTodo({
-                id: '',
-                task: '',
-                completed: false,
-            });
-    }, [editingTodo]);
+        setTodo({
+            id: '',
+            task: '',
+            completed: false,
+        });
+    }, []);
     const validTodo = {
         ...todo,
         id: crypto.randomUUID(),
     };
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (editingTodo) {
-            dispatch(editTodo({ id: editingTodo.id, changes: todo }));
-        } else {
+        if (validTodo.task) {
             dispatch(addTodo(validTodo));
             setTodo({
                 id: '',
                 task: '',
                 completed: false,
             });
+        } else {
+            setTodoErr('Please add a todo before adding...');
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex gap-8 p-8">
+        <form onSubmit={handleSubmit} className="flex gap-6 p-8">
             <div className="text-xl flex items-center gap-4">
                 <input
                     type="text"
                     placeholder="Add your Todo..."
                     aria-label="add todo"
-                    className="border-b-2 border-cyan-500 py-2 outline-0 w-sm"
+                    className="rounded-md shadow-[inset_2px_2px_8px_rgba(0,0,0,0.5)] dark:shadow-[inset_2px_2px_8px_rgba(0,0,0,0.5)] py-3 px-4 outline-0 w-sm text-blue-900 dark:text-gray-200"
                     value={todo.task}
                     onChange={handleTodoChange}
                 />
             </div>
-            <button type="submit" className="bg-blue-400 px-4 py-2 rounded-lg cursor-pointer">
-                {editingTodo ? <SaveAltIcon fontSize="large" /> : <AddIcon fontSize="large" />}
+            <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-400 active:inset-shadow-sm active:inset-shadow-blue-900 px-4 py-2 rounded-md outline-0 cursor-pointer"
+            >
+                <AddIcon fontSize="large" />
             </button>
         </form>
     );
