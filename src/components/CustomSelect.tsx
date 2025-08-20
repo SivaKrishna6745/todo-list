@@ -9,9 +9,16 @@ interface CustomSelectProps<T> {
     options: Option<T>[];
     onSelect: (value: T) => void;
     placeholder?: string;
+    disabled?: boolean;
 }
 
-const CustomSelect = <T,>({ selectedValue, options, onSelect, placeholder }: CustomSelectProps<T>) => {
+const CustomSelect = <T,>({
+    selectedValue,
+    options,
+    onSelect,
+    placeholder,
+    disabled = false,
+}: CustomSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<Option<T> | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -42,7 +49,10 @@ const CustomSelect = <T,>({ selectedValue, options, onSelect, placeholder }: Cus
         <div className="relative w-48" ref={dropdownRef}>
             <button
                 type="button"
-                className="flex justify-between w-full items-center px-4 py-2 text-md font-medium text-gray-700 bg-white border border-gray-400 rounded-md shadow-sm hover:bg-gray-50"
+                disabled={disabled}
+                className={`flex justify-between w-full items-center px-4 py-2 text-md font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-slate-600 border border-gray-400 rounded-md shadow-sm hover:bg-gray-50 ${
+                    disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+                }`}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <span>{selectedOption ? selectedOption.label : placeholder}</span>
