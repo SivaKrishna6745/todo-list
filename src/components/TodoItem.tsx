@@ -92,9 +92,7 @@ const TodoItem = ({ todo, setTodo }: TodoItemProps) => {
                     >
                         {todo.task}
                     </span>
-                    <span className="text-black">
-                        {priorityMap[todo.priority]} {todo.priority}
-                    </span>
+                    <span className="text-black">{priorityMap[todo.priority]}</span>
                     <button
                         className="p-2 bg-cyan-500 rounded-md cursor-pointer flex items-center"
                         onClick={() => setIsEditing(true)}

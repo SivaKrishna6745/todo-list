@@ -77,6 +77,7 @@ const TodoForm = ({ todo, setTodo, setTodoErr }: TodoForm) => {
                     options={priorityOptions}
                     onSelect={handlePriorityChange}
                     placeholder="select priority"
+                    disabled={todo.task === ''}
                 />
             </div>
             <button

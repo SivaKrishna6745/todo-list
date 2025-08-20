@@ -4,8 +4,19 @@ import TodoForm from './components/TodoForm';
 import TodoList from './components/TodoList';
 import { Bedtime, Sunny } from '@mui/icons-material';
 import type { Todo } from './types';
+import CustomSelect from './components/CustomSelect';
+import { useDispatch, useSelector } from 'react-redux';
+import { sortByPriority } from './features/todo/todoSlice';
+import type { RootState } from './features/store';
+
+const sortPriorityOptions = [
+    { label: 'Low to High', value: 'lowToHigh' },
+    { label: 'High to Low', value: 'highToLow' },
+];
 
 function App() {
+    const dispatch = useDispatch();
+    const todos = useSelector((state: RootState) => state.todos.todos);
     const [todo, setTodo] = useState<Todo>({
         id: '',
         task: '',
@@ -20,11 +31,21 @@ function App() {
     useEffect(() => {
         document.documentElement.className = theme === 'dark' ? 'dark' : '';
     }, [theme]);
+    const handleSortByPriority = (option: string) => {
+        dispatch(sortByPriority(option));
+    };
+    console.log(todos.length);
 
     return (
         <div className="mt-5 p-4 bg-sky-50 dark:bg-sky-950 rounded-lg flex flex-col items-center w-[50vw] min-h-[50vh] m-auto">
             <div className="flex items-center gap-8">
                 <h1 className="text-2xl text-slate-900 dark:text-gray-200">Todo List</h1>
+                <CustomSelect
+                    options={sortPriorityOptions}
+                    onSelect={handleSortByPriority}
+                    placeholder="sort by priority"
+                    disabled={todos.length < 2}
+                />
                 <button
                     onClick={toggleLightDarkMode}
                     className="relative inline-flex items-center cursor-pointer outline-0 h-7 w-14 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.5)] rounded-full"
