@@ -28,8 +28,27 @@ const todoSlice = createSlice({
                 todo.id === action.payload ? { ...todo, completed: !todo.completed } : todo
             );
         },
+        sortByPriority: (state: todoState, action: PayloadAction<string>) => {
+            const sortOrder = action.payload;
+            state.todos.sort((a, b) => {
+                const priorityOrder = { high: '3', medium: '2', low: '1' };
+                const aPriority = priorityOrder[a.priority] || 0;
+                const bPriority = priorityOrder[b.priority] || 0;
+                if (sortOrder === 'highToLow') {
+                    // Sort from high to low (e.g., 3, 2, 1)
+                    if (bPriority > aPriority) return 1;
+                    if (bPriority < aPriority) return -1;
+                } else {
+                    // 'lowToHigh'
+                    // Sort from low to high (e.g., 1, 2, 3)
+                    if (aPriority > bPriority) return 1;
+                    if (aPriority < bPriority) return -1;
+                }
+                return 0;
+            });
+        },
     },
 });
 
-export const { addTodo, updateTodo, deleteTodo, toggleTodo } = todoSlice.actions;
+export const { addTodo, updateTodo, deleteTodo, toggleTodo, sortByPriority } = todoSlice.actions;
 export default todoSlice.reducer;
