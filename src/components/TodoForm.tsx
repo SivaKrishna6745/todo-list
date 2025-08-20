@@ -1,29 +1,42 @@
 import AddIcon from '@mui/icons-material/Add';
 import { addTodo } from '../features/todo/todoSlice';
 import { useEffect, useState } from 'react';
-import type { Todo } from '../types';
+import type { Priority, Todo } from '../types';
 import { useDispatch } from 'react-redux';
+import CustomSelect, { type Option } from './CustomSelect';
 
+export const priorityOptions: Option<Priority>[] = [
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' },
+];
 interface TodoForm {
+    todo: Todo;
+    setTodo: React.Dispatch<React.SetStateAction<Todo>>;
     setTodoErr: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const TodoForm = ({ setTodoErr }: TodoForm) => {
+const TodoForm = ({ todo, setTodo, setTodoErr }: TodoForm) => {
     const dispatch = useDispatch();
-    const [todo, setTodo] = useState<Todo>({
-        id: '',
-        task: '',
-        completed: false,
-    });
+    // const [todo, setTodo] = useState<Todo>({
+    //     id: '',
+    //     task: '',
+    //     completed: false,
+    //     priority: 'low',
+    // });
     const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setTodo((prevState) => ({ ...prevState, task: value }));
+    };
+    const handlePriorityChange = (priority: Priority) => {
+        setTodo((prevState) => ({ ...prevState, priority: priority }));
     };
     useEffect(() => {
         setTodo({
             id: '',
             task: '',
             completed: false,
+            priority: 'low',
         });
     }, []);
     const validTodo = {
@@ -38,6 +51,7 @@ const TodoForm = ({ setTodoErr }: TodoForm) => {
                 id: '',
                 task: '',
                 completed: false,
+                priority: 'low',
             });
         } else {
             setTodoErr('Please add a todo before adding...');
@@ -54,6 +68,15 @@ const TodoForm = ({ setTodoErr }: TodoForm) => {
                     className="rounded-md shadow-[inset_2px_2px_8px_rgba(0,0,0,0.5)] dark:shadow-[inset_2px_2px_8px_rgba(0,0,0,0.5)] py-3 px-4 outline-0 w-sm text-blue-900 dark:text-gray-200"
                     value={todo.task}
                     onChange={handleTodoChange}
+                />
+                <CustomSelect
+                    selectedValue={{
+                        label: priorityOptions.find((option) => option.value === todo.priority)?.label,
+                        value: todo.priority,
+                    }}
+                    options={priorityOptions}
+                    onSelect={handlePriorityChange}
+                    placeholder="select priority"
                 />
             </div>
             <button

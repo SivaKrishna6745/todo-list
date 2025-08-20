@@ -1,18 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Todo } from '../types';
+import type { Priority, Todo } from '../types';
 import { SaveAlt } from '@mui/icons-material';
 import { Done, Edit, Delete } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { deleteTodo, toggleTodo, updateTodo } from '../features/todo/todoSlice';
+import CustomSelect from './CustomSelect';
+import { priorityOptions } from './TodoForm';
+
+const priorityMap: Record<string, string> = {
+    low: '⭐',
+    medium: '⭐⭐',
+    high: '⭐⭐⭐',
+};
 
 interface TodoItemProps {
     todo: Todo;
+    setTodo: React.Dispatch<React.SetStateAction<Todo>>;
 }
 
-const TodoItem = ({ todo }: TodoItemProps) => {
+const TodoItem = ({ todo, setTodo }: TodoItemProps) => {
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
     const [editedValue, setEditedValue] = useState<string>(todo.task);
+    const [editedPriority, setEditedPriority] = useState<Priority>('low');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     useEffect(() => {
         if (isEditing && inputRef.current) inputRef.current.focus();
@@ -20,6 +30,9 @@ const TodoItem = ({ todo }: TodoItemProps) => {
     const handleEditingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setEditedValue(value);
+    };
+    const handlePriorityEdit = (priority: Priority) => {
+        setEditedPriority(priority);
     };
     const handleDeleteTodo = (id: string) => {
         dispatch(deleteTodo(id));
@@ -32,14 +45,24 @@ const TodoItem = ({ todo }: TodoItemProps) => {
                     <input
                         type="text"
                         value={editedValue}
-                        className="rounded-md inset-shadow-[0_0_5px] inset-shadow-cyan-800 py-3 px-4 flex-1 outline-0"
+                        className="rounded-md inset-shadow-[0_0_5px] inset-shadow-cyan-800 py-3 px-4 flex-1 outline-0 text-blue-900 dark:text-gray-200"
                         ref={inputRef}
                         onChange={handleEditingChange}
+                    />
+                    <CustomSelect
+                        placeholder="select priority"
+                        options={priorityOptions}
+                        onSelect={handlePriorityEdit}
                     />
                     <button
                         className="bg-blue-400 px-4 py-2 rounded-lg cursor-pointer"
                         onClick={() => {
-                            dispatch(updateTodo({ id: todo.id, changes: { ...todo, task: editedValue } }));
+                            dispatch(
+                                updateTodo({
+                                    id: todo.id,
+                                    changes: { ...todo, task: editedValue, priority: editedPriority },
+                                })
+                            );
                             setIsEditing(false);
                         }}
                     >
@@ -68,6 +91,9 @@ const TodoItem = ({ todo }: TodoItemProps) => {
                         } text-blue-900 dark:text-gray-200`}
                     >
                         {todo.task}
+                    </span>
+                    <span className="text-black">
+                        {priorityMap[todo.priority]} {todo.priority}
                     </span>
                     <button
                         className="p-2 bg-cyan-500 rounded-md cursor-pointer flex items-center"
